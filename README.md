@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/icon.png" width="140" alt="PalisadeDB icon">
+  <img src="assets/icon.svg" width="140" alt="PalisadeDB icon">
   <h1>PalisadeDB</h1>
   <p><strong>A small custom local database engine with its own pager, B+ tree, SQL layer, and recovery machinery.</strong></p>
 </div>
