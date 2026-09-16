@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-label="PalisadeDB interface preview">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0d1218"/><stop offset="1" stop-color="#080b0f"/></linearGradient></defs>
+<rect width="1200" height="720" rx="28" fill="url(#bg)"/>
+<rect x="32" y="28" width="1136" height="664" rx="18" fill="#111820" stroke="#2b3541" stroke-width="2"/>
+<text x="68" y="88" fill="#f2f4f7" font-family="Segoe UI,Arial" font-size="34" font-weight="700">PalisadeDB</text>
+<text x="68" y="122" fill="#8f99a6" font-family="Segoe UI,Arial" font-size="16">Database Workbench</text>
+<rect x="68" y="148" width="1064" height="2" fill="#ffb21f" opacity=".85"/>
+<text x="68" y="175" fill="#d7dce3" font-family="Segoe UI,Arial" font-size="18">SELECT * FROM users;</text><text x="68" y="221" fill="#d7dce3" font-family="Segoe UI,Arial" font-size="18">2 rows</text><text x="68" y="267" fill="#d7dce3" font-family="Segoe UI,Arial" font-size="18">B+ Tree  height 2</text><text x="68" y="313" fill="#d7dce3" font-family="Segoe UI,Arial" font-size="18">WAL  clean</text>
+<rect x="650" y="188" width="420" height="360" rx="18" fill="#0b1015" stroke="#28333e"/>
+<path d="M690 470 C760 350 820 420 875 295 S980 280 1030 218" fill="none" stroke="#ffb21f" stroke-width="4" opacity=".9"/>
+<circle cx="690" cy="470" r="8" fill="#ffb21f"/><circle cx="875" cy="295" r="8" fill="#ffb21f"/><circle cx="1030" cy="218" r="8" fill="#ffb21f"/>
+<text x="68" y="645" fill="#6f7985" font-family="Consolas,monospace" font-size="14">LOCAL-FIRST · NO ACCOUNT · WINDOWS DESKTOP</text>
+</svg>

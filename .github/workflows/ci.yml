@@ -4,13 +4,45 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  syntax-check:
-    runs-on: ubuntu-latest
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.10', '3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Compile sources
+        run: python -m compileall -q .
+
+  windows-build:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Compile Python sources
-        run: python -m compileall -q .
+      - name: Build executable
+        shell: powershell
+        run: .\build-windows.ps1
+      - name: Verify executable
+        shell: powershell
+        run: |
+          if (-not (Test-Path 'dist\PalisadeDB.exe')) { throw 'Executable was not created' }
+          $size = (Get-Item 'dist\PalisadeDB.exe').Length
+          if ($size -lt 1000000) { throw "Executable looks unexpectedly small: $size bytes" }
+          Write-Host "Verified dist\PalisadeDB.exe ($size bytes)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PalisadeDB-windows
+          path: dist/PalisadeDB.exe
+          if-no-files-found: error

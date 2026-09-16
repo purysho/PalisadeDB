@@ -1,32 +1,41 @@
 <div align="center">
-  <img src="assets/icon.svg" width="140" alt="PalisadeDB icon">
+  <img src="assets/icon.png" width="132" alt="PalisadeDB icon">
   <h1>PalisadeDB</h1>
-  <p><strong>A small custom local database engine with its own pager, B+ tree, SQL layer, and recovery machinery.</strong></p>
+  <p><strong>A compact custom local database engine with its own pager, B+ tree, SQL layer, and recovery machinery.</strong></p>
+  <p>
+    <a href="https://github.com/purysho/PalisadeDB/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/purysho/PalisadeDB/actions/workflows/ci.yml/badge.svg"></a>
+    <a href="https://github.com/purysho/PalisadeDB/releases"><img alt="Releases" src="https://img.shields.io/github/v/release/purysho/PalisadeDB?display_name=tag&sort=semver"></a>
+    <a href="LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-202832.svg"></a>
+  </p>
+  <p><a href="https://github.com/purysho/PalisadeDB/releases"><strong>Download for Windows</strong></a> · <a href="#run-from-source">Run from source</a> · <a href="https://github.com/purysho/PalisadeDB/issues">Report an issue</a></p>
 </div>
 
-PalisadeDB is an educational but functional local database engine implemented in Python without SQLite or another database engine underneath. The desktop interface can create and open `.pdb` databases, execute supported SQL, and inspect internal storage structures.
+![PalisadeDB desktop interface preview](docs/interface-preview.svg)
 
-## Features
+## What it does
 
-- Custom `.pdb` database format
+- Custom .pdb database format
 - Page-based storage layer
-- B+ tree implementation
-- SQL parsing and execution for the supported subset
-- Transaction and write-ahead-log/recovery machinery
-- Schema inspection
-- Page and tree inspection
-- Database statistics and integrity information
-- Windows desktop interface
+- B+ tree indexes
+- SQL parsing and execution
+- Transactions and WAL/recovery machinery
+- Schema, page, tree, stats, and integrity inspection
+
+## Download
+
+Tagged releases are built on `windows-latest` by GitHub Actions. Each release contains `PalisadeDB.exe` and `PalisadeDB.exe.sha256`. The executable is produced from the source at that tag with PyInstaller.
+
+> Until the first tagged release is published, the latest Windows build is available as the **PalisadeDB-windows** artifact on successful CI runs.
 
 ## Run from source
 
-Requirements: Windows and Python 3.10+.
+Requirements: Python 3.10+ with Tk support.
 
 ```powershell
 pyw palisadedb_desktop.pyw
 ```
 
-PalisadeDB uses Python's standard library and Tkinter; there are no third-party runtime dependencies.
+The application uses Python's standard library at runtime.
 
 ## Build a standalone Windows executable
 
@@ -40,29 +49,20 @@ Output:
 dist\PalisadeDB.exe
 ```
 
-## Project structure
+## Privacy
 
-```text
-PalisadeDB/
-├── palisade/
-│   ├── btree.py         # B+ tree implementation
-│   ├── engine.py        # database engine
-│   ├── pager.py         # page storage / transaction primitives
-│   └── sql.py           # SQL parser
-├── palisadedb_desktop.pyw
-├── build-windows.ps1
-├── assets/
-└── .github/workflows/
-```
+PalisadeDB stores databases in local files and does not require a server, account, or network service.
 
-## Why build a database engine?
+## Scope
 
-PalisadeDB is meant to expose the mechanics usually hidden behind a database API: pages, indexes, transactions, parsing, persistence, and recovery. It is useful as a compact systems-programming project and as a sandbox for learning database internals.
+PalisadeDB is an educational but functional engine, not a production replacement for mature database systems. Its SQL grammar and durability model are intentionally compact and inspectable.
 
-## Current scope
+## Release process
 
-PalisadeDB is not intended as a production replacement for mature database systems. Its SQL grammar and durability model are intentionally smaller and easier to inspect.
+- Every push runs tests/compile checks and builds a Windows executable artifact.
+- Tags matching `v*` build the executable again, compute SHA256, and publish both files to GitHub Releases.
+- See [CHANGELOG.md](CHANGELOG.md) for release history.
 
-## Status
+## License
 
-V1.1 — custom pager, B+ tree, SQL layer, database engine, recovery-related machinery, and Windows inspection UI.
+MIT
