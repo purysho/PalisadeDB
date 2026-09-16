@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">PalisadeDB</title>
+  <desc id="desc">Dark fortress surrounding an amber database.</desc>
+  <rect width="256" height="256" rx="42" fill="#101720"/>
+  <path d="M50 198v-78l30-18V58l26-12v30l22-8 22 8V46l26 12v44l30 18v78h-34v-84l-22-12v96h-44v-96l-22 12v84z" fill="#313d4c" stroke="#050708" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M76 62l52-22 52 22-52 28z" fill="#3b4654" stroke="#050708" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M128 104c-20 0-36 7-36 15v54c0 8 16 15 36 15s36-7 36-15v-54c0-8-16-15-36-15z" fill="#26313d" stroke="#050708" stroke-width="6"/>
+  <ellipse cx="128" cy="119" rx="36" ry="15" fill="#394653"/>
+  <path d="M92 137c0 8 16 15 36 15s36-7 36-15M92 157c0 8 16 15 36 15s36-7 36-15" fill="none" stroke="#ffb21f" stroke-width="7"/>
+  <path d="M128 74v22M66 129v32M190 129v32" stroke="#ffb21f" stroke-width="8" stroke-linecap="round"/>
+</svg>
