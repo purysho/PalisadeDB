@@ -9,16 +9,17 @@ on:
       version:
         description: 'Release tag (for example v1.0.0)'
         required: true
-        default: 'v1.0.0'
 
 permissions:
   contents: write
 
 env:
+  APP: PalisadeDB
+  ENTRY: palisadedb_desktop.pyw
   RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
 
 jobs:
-  windows-release:
+  windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,22 +31,91 @@ jobs:
       - name: Build executable
         shell: powershell
         run: .\build-windows.ps1
-      - name: Smoke check executable
+      - name: Verify and name executable
         shell: powershell
         run: |
-          if (!(Test-Path 'dist\PalisadeDB.exe')) { throw 'PalisadeDB.exe was not built' }
-          if ((Get-Item 'dist\PalisadeDB.exe').Length -le 0) { throw 'PalisadeDB.exe is empty' }
-      - name: Create checksum
-        shell: powershell
+          $exe = "dist\$env:APP.exe"
+          if (!(Test-Path $exe)) { throw "$exe was not built" }
+          $size = (Get-Item $exe).Length
+          if ($size -lt 1000000) { throw "$exe looks unexpectedly small: $size bytes" }
+          New-Item -ItemType Directory -Force out | Out-Null
+          Copy-Item $exe "out\$env:APP-Windows-x64.exe"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: out/*
+          if-no-files-found: error
+
+  unix:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            platform: macOS-arm64
+          - os: ubuntu-22.04
+            platform: Linux-x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+      - name: Build
+        shell: bash
         run: |
-          $hash = (Get-FileHash 'dist\PalisadeDB.exe' -Algorithm SHA256).Hash.ToLower()
-          "$hash  PalisadeDB.exe" | Out-File -Encoding ascii 'dist\PalisadeDB.exe.sha256'
+          set -euo pipefail
+          python -m pip install --upgrade pip pyinstaller pillow
+          if [ -f tools/make_icon.py ]; then python tools/make_icon.py; fi
+          mkdir -p out
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            icon=()
+            for f in assets/icon.png assets/icon.ico; do
+              if [ -f "$f" ]; then icon=(--icon "$f"); break; fi
+            done
+            python -m PyInstaller --noconfirm --clean --windowed --name "$APP" "${icon[@]}" "$ENTRY"
+            test -d "dist/$APP.app"
+            ditto -c -k --keepParent "dist/$APP.app" "out/$APP-${{ matrix.platform }}.zip"
+          else
+            python -m PyInstaller --noconfirm --clean --onefile --windowed --name "$APP" "$ENTRY"
+            test -x "dist/$APP"
+            tar -C dist -czf "out/$APP-${{ matrix.platform }}.tar.gz" "$APP"
+          fi
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}
+          path: out/*
+          if-no-files-found: error
+
+  publish:
+    needs: [windows, unix]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - name: Checksums
+        run: |
+          cd out
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
-          files: |
-            dist/PalisadeDB.exe
-            dist/PalisadeDB.exe.sha256
+          body: |
+            ## Download
+
+            | Platform | File |
+            |---|---|
+            | Windows 10/11 (x64) | `${{ env.APP }}-Windows-x64.exe` — portable, no installer |
+            | macOS (Apple Silicon) | `${{ env.APP }}-macOS-arm64.zip` — unzip and move to Applications |
+            | Linux (x86_64) | `${{ env.APP }}-Linux-x86_64.tar.gz` — extract and run `./${{ env.APP }}` |
+
+            These builds are not yet code-signed. On first launch, Windows SmartScreen may ask you to confirm ("More info" → "Run anyway"), and macOS may block the app until you Control-click it and choose **Open**. Verify a download against `SHA256SUMS.txt` if you want an independent integrity check.
+          files: out/*

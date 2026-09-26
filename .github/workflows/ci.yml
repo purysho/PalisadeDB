@@ -46,3 +46,34 @@ jobs:
           name: PalisadeDB-windows
           path: dist/PalisadeDB.exe
           if-no-files-found: error
+
+  package:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    env:
+      APP: PalisadeDB
+      ENTRY: palisadedb_desktop.pyw
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip pyinstaller pillow
+          if [ -f tools/make_icon.py ]; then python tools/make_icon.py; fi
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            icon=()
+            for f in assets/icon.png assets/icon.ico; do
+              if [ -f "$f" ]; then icon=(--icon "$f"); break; fi
+            done
+            python -m PyInstaller --noconfirm --clean --windowed --name "$APP" "${icon[@]}" "$ENTRY"
+            test -d "dist/$APP.app"
+          else
+            python -m PyInstaller --noconfirm --clean --onefile --windowed --name "$APP" "$ENTRY"
+            test -x "dist/$APP"
+          fi
