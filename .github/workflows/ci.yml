@@ -73,7 +73,9 @@ jobs:
             done
             python -m PyInstaller --noconfirm --clean --windowed --name "$APP" "${icon[@]}" "$ENTRY"
             test -d "dist/$APP.app"
+            .github/scripts/launch-check.sh "dist/$APP.app/Contents/MacOS/$APP"
           else
             python -m PyInstaller --noconfirm --clean --onefile --windowed --name "$APP" "$ENTRY"
             test -x "dist/$APP"
+            .github/scripts/launch-check.sh "dist/$APP"
           fi
