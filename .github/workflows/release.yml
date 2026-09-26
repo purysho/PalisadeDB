@@ -1,3 +1,12 @@
+# Code signing is optional and switches on by itself once these repository
+# secrets exist (Settings -> Secrets and variables -> Actions):
+#   Windows (Azure Artifact Signing): AZURE_TENANT_ID, AZURE_CLIENT_ID,
+#     AZURE_CLIENT_SECRET, AZURE_SIGNING_ENDPOINT, AZURE_SIGNING_ACCOUNT,
+#     AZURE_CERT_PROFILE
+#   macOS (Developer ID + notarization): APPLE_CERT_P12, APPLE_CERT_PASSWORD,
+#     APPLE_ID, APPLE_TEAM_ID, APPLE_APP_PASSWORD
+# Without them, builds are published unsigned, as before.
+
 name: Release
 
 on:
@@ -21,6 +30,8 @@ env:
 jobs:
   windows:
     runs-on: windows-latest
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,6 +51,22 @@ jobs:
           if ($size -lt 1000000) { throw "$exe looks unexpectedly small: $size bytes" }
           New-Item -ItemType Directory -Force out | Out-Null
           Copy-Item $exe "out\$env:APP-Windows-x64.exe"
+      - name: Sign Windows executable
+        # Runs only once the Artifact Signing secrets exist; see the header of this file.
+        if: env.AZURE_CLIENT_ID != ''
+        uses: azure/artifact-signing-action@v2
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
+          signing-account-name: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ secrets.AZURE_CERT_PROFILE }}
+          files-folder: ${{ github.workspace }}\out
+          files-folder-filter: exe
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
       - uses: actions/upload-artifact@v4
         with:
           name: windows
@@ -55,6 +82,12 @@ jobs:
           - os: ubuntu-22.04
             platform: Linux-x86_64
     runs-on: ${{ matrix.os }}
+    env:
+      APPLE_CERT_P12: ${{ secrets.APPLE_CERT_P12 }}
+      APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -76,6 +109,7 @@ jobs:
             done
             python -m PyInstaller --noconfirm --clean --windowed --name "$APP" "${icon[@]}" "$ENTRY"
             test -d "dist/$APP.app"
+            .github/scripts/sign-macos.sh "dist/$APP.app"
             ditto -c -k --keepParent "dist/$APP.app" "out/$APP-${{ matrix.platform }}.zip"
           else
             python -m PyInstaller --noconfirm --clean --onefile --windowed --name "$APP" "$ENTRY"
