@@ -6,11 +6,12 @@
     <a href="https://github.com/purysho/PalisadeDB/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/purysho/PalisadeDB/actions/workflows/ci.yml/badge.svg"></a>
     <a href="https://github.com/purysho/PalisadeDB/releases"><img alt="Releases" src="https://img.shields.io/github/v/release/purysho/PalisadeDB?display_name=tag&sort=semver"></a>
     <a href="LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-202832.svg"></a>
+    <a href="#download"><img alt="Status: beta" src="https://img.shields.io/badge/status-beta-C9A44C.svg"></a>
   </p>
-  <p><a href="https://github.com/purysho/PalisadeDB/releases"><strong>Download for Windows</strong></a> · <a href="#run-from-source">Run from source</a> · <a href="https://github.com/purysho/PalisadeDB/issues">Report an issue</a></p>
+  <p><strong>Download:</strong> <a href="https://github.com/purysho/PalisadeDB/releases/latest/download/PalisadeDB-Windows-x64.exe">Windows</a> · <a href="https://github.com/purysho/PalisadeDB/releases/latest/download/PalisadeDB-macOS-arm64.zip">macOS</a> · <a href="https://github.com/purysho/PalisadeDB/releases/latest/download/PalisadeDB-Linux-x86_64.tar.gz">Linux</a> · <a href="#run-from-source">Run from source</a> · <a href="https://github.com/purysho/PalisadeDB/issues">Report an issue</a></p>
 </div>
 
-![PalisadeDB desktop interface preview](docs/interface-preview.svg)
+![PalisadeDB running a query against a sample library database](docs/screenshot.png)
 
 ## What it does
 
@@ -23,9 +24,15 @@
 
 ## Download
 
-Tagged releases are built on `windows-latest` by GitHub Actions. Each release contains `PalisadeDB.exe` and `PalisadeDB.exe.sha256`. The executable is produced from the source at that tag with PyInstaller.
+| Platform | File |
+|---|---|
+| Windows 10/11 (x64) | [PalisadeDB-Windows-x64.exe](https://github.com/purysho/PalisadeDB/releases/latest/download/PalisadeDB-Windows-x64.exe) — portable, no installer |
+| macOS (Apple Silicon) | [PalisadeDB-macOS-arm64.zip](https://github.com/purysho/PalisadeDB/releases/latest/download/PalisadeDB-macOS-arm64.zip) — unzip and move to Applications |
+| Linux (x86_64) | [PalisadeDB-Linux-x86_64.tar.gz](https://github.com/purysho/PalisadeDB/releases/latest/download/PalisadeDB-Linux-x86_64.tar.gz) — extract and run `./PalisadeDB` |
 
-> Until the first tagged release is published, the latest Windows build is available as the **PalisadeDB-windows** artifact on successful CI runs.
+Each [release](https://github.com/purysho/PalisadeDB/releases) is built from the tagged source by GitHub Actions and carries a `SHA256SUMS.txt`. The builds are not yet code-signed, so on first launch Windows SmartScreen may ask you to confirm ("More info" → "Run anyway"), and macOS may need you to Control-click the app and choose **Open**.
+
+**Status: beta.** PalisadeDB does what this README describes and is covered by CI on Windows, macOS and Linux, but it is young: expect rough edges, and please [report them](https://github.com/purysho/PalisadeDB/issues).
 
 ## Run from source
 
